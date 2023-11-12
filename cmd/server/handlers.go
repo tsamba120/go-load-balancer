@@ -41,7 +41,6 @@ func (app *application) put(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not unmarshal request body", http.StatusBadRequest)
 	}
 
-	// mutex bc i want to
 	app.mu.Lock()
 	(*app.keyValueStore)[b.Key] = b.Value
 	app.mu.Unlock()
@@ -55,7 +54,9 @@ func (app *application) put(w http.ResponseWriter, r *http.Request) {
 func (app *application) get(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
 
+	app.mu.Lock()
 	value := (*app.keyValueStore)[key]
+	app.mu.Unlock()
 
 	response := getResponseBody{
 		Key: key,
